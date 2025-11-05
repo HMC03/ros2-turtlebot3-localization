@@ -32,6 +32,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'motion_sensor_models = tb3_localization.motion_sensor_models:main',
         ],
     },
 )
