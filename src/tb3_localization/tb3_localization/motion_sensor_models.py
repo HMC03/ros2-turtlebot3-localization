@@ -73,7 +73,7 @@ class MapUtils:
         # A reliable approach: use nav2 style: occupied if pixel <= occupied_thresh*255 when negate=0
         # but empirically map images from nav2 often have 0 free, 205 unknown, 254 occupied.
         # We'll choose a heuristic: occupied if pixel >= 250
-        self.occ_mask = (processed >= 250).astype(np.uint8)  # 1 for obstacles
+        self.occ_mask = (processed <= 50).astype(np.uint8)  # 1 for obstacles
 
         # compute distance transform in meters
         self.distance_field = self._compute_distance_field(self.occ_mask)  # same shape, units meters
@@ -114,15 +114,29 @@ class MapUtils:
             return df
 
     def save_distance_field_png(self, out_path):
-        # scale for visualization (normalize to 0..255)
+        """
+        Save distance field to grayscale PNG for visualization.
+        Uses a fixed physical scale (0–2.0 m) for consistent shading.
+        Obstacles = white, open space = dark gray.
+        """
         df = self.distance_field.copy()
-        # clamp to some max for better contrast
-        max_m = np.percentile(df[np.isfinite(df)], 95) if np.isfinite(df).any() else df.max()
-        if max_m == 0:
-            max_m = 1.0
-        vis = (np.clip(df, 0, max_m) / max_m * 255).astype(np.uint8)
-        # invert so obstacles (0m) are dark, far are bright
-        vis = 255 - vis
+
+        # Choose a fixed visualization range in meters
+        # This prevents normalization from changing between maps
+        max_m = 0.5  # how far from walls the gradient extends visibly
+
+        # Clip and normalize linearly
+        vis = np.clip(df, 0, max_m) / max_m
+
+        # Invert so walls are white and free space is darker
+        vis = 1.0 - vis
+
+        # Convert to 0–255 grayscale
+        vis = (vis * 255).astype(np.uint8)
+
+        # Force obstacles to pure white
+        vis[self.occ_mask == 1] = 255
+
         Image.fromarray(vis).save(out_path)
         return out_path
 
