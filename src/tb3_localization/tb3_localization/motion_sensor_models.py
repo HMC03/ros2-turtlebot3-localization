@@ -20,6 +20,7 @@ from std_msgs.msg import Float64
 
 import numpy as np
 import math, time, os, yaml
+import ament_index_python.packages as pkg_index
 
 # imaging libs
 try:
@@ -284,14 +285,23 @@ class MotionSensorNode(Node):
 
 
 def main(args=None):
+
     rclpy.init(args=args)
-    # Change this path to your map.yaml
-    map_yaml = os.path.expanduser('~/HMC03/ros2-turtlebot3-localization/src/tb3_localization/maps/map.yaml')
+
+    # Try to find the package share directory dynamically
+    try:
+        package_share = pkg_index.get_package_share_directory('tb3_localization')
+    except Exception as e:
+        raise RuntimeError("Could not locate the 'tb3_localization' package. "
+                           "Ensure it is built and sourced before running.") from e
+
+    # Construct the path to the map.yaml
+    map_yaml = os.path.join(package_share, 'maps', 'map.yaml')
+
     if not os.path.exists(map_yaml):
-        # try other location used earlier
-        map_yaml = os.path.expanduser('~/HMC03/ros2-turtlebot3-localization/src/tb3_localization/map.yaml')
-    if not os.path.exists(map_yaml):
-        raise FileNotFoundError(f'Could not find map.yaml. Update path in script. Tried: {map_yaml}')
+        raise FileNotFoundError(f"Could not find map.yaml at {map_yaml}. "
+                                "Make sure you have saved a map into tb3_localization/maps/")
+
     node = MotionSensorNode(map_yaml)
     try:
         rclpy.spin(node)
@@ -299,6 +309,7 @@ def main(args=None):
         pass
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
