@@ -22,6 +22,10 @@ setup(
         (os.path.join('share', package_name, 'rviz'), [
             os.path.join('rviz', 'tb3_gazebo.rviz')
         ]),
+        (os.path.join('share', package_name, 'maps'), [
+            os.path.join('maps', 'map.pgm'),
+            os.path.join('maps', 'map.yaml')
+        ]),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
