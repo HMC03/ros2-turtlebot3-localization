@@ -250,6 +250,14 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz_default_plugins/PoseArray
+      Name: ParticleCloud
+      Topic: /particle_cloud
+      Enabled: true
+      Color: 0; 255; 0
+      Arrow Length: 0.3
+      Shape: Arrow
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
