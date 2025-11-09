@@ -22,6 +22,13 @@ Panels:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz_default_plugins/Map
+      Name: Map
+      Topic: /map
+      Enabled: true
+      Alpha: 1.0
+      Color Scheme: map
+      Value: true  
     - Alpha: 0.5
       Cell Size: 1
       Class: rviz_default_plugins/Grid
