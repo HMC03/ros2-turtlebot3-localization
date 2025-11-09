@@ -15,12 +15,14 @@ setup(
         (os.path.join('share', package_name, 'launch'), [
             os.path.join('launch', 'gz_tb3_house.launch.py'),
             os.path.join('launch', 'gz_rviz_tb3_house.launch.py'),
+            os.path.join('launch', 'localization.launch.py'),
         ]),
         (os.path.join('share', package_name, 'worlds'), [
             os.path.join('worlds', 'turtlebot3_house.world')
         ]),
         (os.path.join('share', package_name, 'rviz'), [
-            os.path.join('rviz', 'tb3_gazebo.rviz')
+            os.path.join('rviz', 'tb3_gazebo.rviz'),
+            os.path.join('rviz', 'tb3_localization.rviz')
         ]),
         (os.path.join('share', package_name, 'maps'), [
             os.path.join('maps', 'map.pgm'),
@@ -37,6 +39,8 @@ setup(
     entry_points={
         'console_scripts': [
             'motion_sensor_models = tb3_localization.motion_sensor_models:main',
+            'particle_filter_node = tb3_localization.particle_filter_node:main',
+            'mcl_node = tb3_localization.mcl_node:main',
         ],
     },
 )
