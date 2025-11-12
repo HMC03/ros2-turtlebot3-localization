@@ -39,7 +39,6 @@ setup(
     entry_points={
         'console_scripts': [
             'motion_sensor_models = tb3_localization.motion_sensor_models:main',
-            'particle_filter_node = tb3_localization.particle_filter_node:main',
             'mcl_node = tb3_localization.mcl_node:main',
         ],
     },
