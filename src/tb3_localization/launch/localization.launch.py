@@ -90,20 +90,36 @@ def generate_launch_description():
         emulate_tty=True,
     )
 
-    configure_map = TimerAction(
-        period=1.0,
-        actions=[ExecuteProcess(
-            cmd=['ros2', 'lifecycle', 'set', '/map_server', 'configure'],
-            output='screen'
-        )]
-    )
+    lifecycle_manager = ExecuteProcess(
+        cmd=['bash', '-c', '''
+        echo "MAP SERVER LIFECYCLE MANAGER — WAITING..."
+        until ros2 node list | grep -q map_server; do sleep 0.5; done
+        echo "map_server found → loading map..."
 
-    activate_map = TimerAction(
-        period=2.0,
-        actions=[ExecuteProcess(
-            cmd=['ros2', 'lifecycle', 'set', '/map_server', 'activate'],
-            output='screen'
-        )]
+        # CONFIGURE with retry
+        for i in {1..30}; do
+            if ros2 lifecycle set /map_server configure >/dev/null 2>&1; then
+                echo "CONFIGURE SUCCESS"
+                break
+            fi
+            sleep 0.5
+        done
+
+        # ACTIVATE with retry
+        for i in {1..20}; do
+            if ros2 lifecycle set /map_server activate >/dev/null 2>&1; then
+                echo ""
+                echo "MAP FULLY ACTIVE"
+                echo "313 × 225 @ 0.05m/cell"
+                echo "RUN: ros2 run tb3_localization mcl_node"
+                echo ""
+                exit 0
+            fi
+            sleep 0.5
+        done
+        echo "FAILED TO ACTIVATE"
+        '''],
+        output='screen'
     )
 
     # static transform
@@ -133,8 +149,7 @@ def generate_launch_description():
     ld.add_action(set_env_vars_resources)
     ld.add_action(gz_service_bridge)
     ld.add_action(map_server)
-    ld.add_action(configure_map)
-    ld.add_action(activate_map)
+    ld.add_action(lifecycle_manager)
     ld.add_action(static_transform_publisher)
     ld.add_action(rviz_cmd)
     return ld
