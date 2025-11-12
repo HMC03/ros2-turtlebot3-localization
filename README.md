@@ -127,6 +127,11 @@ The distance field image will appear in:
 src/tb3_localization/maps/distance_field.png
 ```
 
+### Run Localization
+```bash
+ros2 run tb3_localization mcl_node
+```
+
 ## Results
 
 ### Map
